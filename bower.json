@@ -1,7 +1,7 @@
 {
   "name": "backbone-datarouter",
-  "version": "0.1.0",
-  "main": "build/backbone-datarouter.js",
+  "version": "0.1.1",
+  "main": "build",
   "ignore": [
     "lib",
     "test",

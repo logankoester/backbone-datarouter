@@ -1,14 +1,7 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  require.config({
-    paths: {
-      cache: require.toUrl('backbone-datarouter/../cache'),
-      authorize: require.toUrl('backbone-datarouter/../authorize')
-    }
-  });
-
-  define(['require', 'underscore', 'backbone', 'cache', 'kinvey', 'authorize/kinvey'], function(require, _, Backbone, Cache, Kinvey, Authorize) {
+  define(['require', 'underscore', 'backbone', 'cache', 'kinvey', 'backbone-datarouter/authorize_kinvey'], function(require, _, Backbone, Cache, Kinvey, Authorize) {
     var Route;
     Route = (function() {
       Route.defaults = {

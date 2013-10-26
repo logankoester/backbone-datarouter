@@ -1,15 +1,10 @@
-require.config
-  paths:
-    cache: require.toUrl('backbone-datarouter/../cache')
-    authorize: require.toUrl('backbone-datarouter/../authorize')
-
 define [
   'require',
   'underscore',
   'backbone',
   'cache',
   'kinvey',
-  'authorize/kinvey'
+  'backbone-datarouter/authorize_kinvey'
 ], (require, _, Backbone, Cache, Kinvey, Authorize) ->
 
   # Use the Route class to construct handlers for your router and
