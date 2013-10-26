@@ -1,0 +1,25 @@
+{
+  "name": "backbone-datarouter",
+  "version": "0.1.0",
+  "main": "build/backbone-datarouter.js",
+  "ignore": [
+    "lib",
+    "test",
+    "example",
+    "util",
+    "node_modules",
+    "components",
+    "Gruntfile.js",
+    "**/.*",
+    "**/*.json",
+    "**/*.html"
+  ],
+  "dependencies": {
+    "backbone": "~1.0.0",
+    "jquery": "~2.0.2",
+    "underscore": "~1.5.2",
+    "moment": "~2.3.1",
+    "chance": "~0.4.3"
+  },
+  "devDependencies": {}
+}

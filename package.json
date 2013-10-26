@@ -1,0 +1,28 @@
+{
+  "name": "backbone-datarouter",
+  "version": "0.1.0",
+  "private": true,
+  "author": "Logan Koester",
+  "description": "description",
+  "contributors": [
+    {
+      "name": "Logan Koester",
+      "url": "https://example.com",
+      "email": "you@example.com"
+    }
+  ],
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+    "bower": "~1.2.7"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt-config-dir": "~0.3.0",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-clean": "~0.5.0"
+  }
+}
