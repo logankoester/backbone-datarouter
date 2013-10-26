@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "author": "Logan Koester",
-  "description": "description",
+  "description": "A router abstraction built with jquery-mobile, localstorage caching, and backbone collections in mind.",
   "contributors": [
     {
       "name": "Logan Koester",
-      "url": "https://example.com",
-      "email": "you@example.com"
+      "url": "http://logankoester.com",
+      "email": "logan@logankoester.com"
     }
   ],
   "scripts": {
