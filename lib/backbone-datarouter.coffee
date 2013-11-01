@@ -21,7 +21,7 @@ define [
   #   myApp.route '#birds': 'BirdsView', collection: 'Birds'
   #
   class Route
-  
+
     @defaults:
       cache: true
       vibrate: 50
@@ -30,10 +30,11 @@ define [
         hide: -> $.mobile.loading 'hide'
       authorize: (route) -> $.Deferred().resolve().promise()
       logger: Route.logger
-  
+      online: -> navigator.onLine
+
     # @property logger [Object] Optional logger dependency (such as npm's loglevel).
     @logger: console
-  
+
     # Construct, validate, and then register a new route to an object.
     #
     # @extend Backbone.Events
@@ -49,6 +50,7 @@ define [
     # @option options events [Object] Events hash for routing lifecycle.
     # @option options authorize [Function] Optional function returning a promise. Routing will continue when fulfilled, or abort when rejected. This route instance will be passed as a parameter.
     # @option options logger [Object] Optional logger dependency (such as npm's loglevel). Updates Route.logger if set (affects all routes).
+    # @option options online [Function] Function to use when checking if the app is in its online state. Return true for online, false for offline
     # @option options region [Function] A function that returns an object implementing show(view), given @options.app as a parameter.
     #
     # @note The model will be inferred the pattern matches an 'id' param, and a single model will be fetched for the view instead.
@@ -56,18 +58,18 @@ define [
     #
     constructor: (@options) ->
       _.extend @, Backbone.Events
-  
+
       @options ||= {}
       @options = _.extend @options, Route.defaults
       Route.logger = @options.logger if @options.logger
-  
+
       @on 'all', (event) -> Route.logger.debug 'Route event', event
-  
+
       @errors = !@validate(@options)
       if @errors
         Route.logger.error "Route has invalid options", @errors, @
       @register @options['app'], @options['pattern']
-  
+
     # Check if a route options hash is valid.
     #
     # @param options [Object] An options hash
@@ -76,7 +78,7 @@ define [
     #
     validate: (options) ->
       errors = []
-  
+
       if !options['pattern'] then errors.push 'Missing option "pattern"'
       if !options['view'] then errors.push 'Missing option "view"'
       if !options['app'] then errors.push 'Missing option "app"'
@@ -87,9 +89,9 @@ define [
           errors.push "spinner.hide is not a function"
       if options['model'] && options['collection']
         errors.push 'Route does not support fetching both a model and collection'
-  
+
       _.isEmpty(errors) ? false : errors
-  
+
     # Sets the current instance's @_handler method to a named property
     # of app.routes. The routes object will be created if it does not
     # exist.
@@ -106,7 +108,7 @@ define [
         route: @
         events: 'bC'
         argsre: true
-  
+
     # Handles the routing behavior when actually triggered.
     # Called by jquerymobile-router on the registered events.
     #
@@ -114,46 +116,46 @@ define [
       e.preventDefault()
       @_eventWrapper ui
       @trigger 'before'
-  
+
       # @todo Decouple router adapter from app object
       params = @options.app.router.getParams(match['input'])
-  
+
       @options.authorize(@)
         .done =>
           if @options.collection
             if id = params['id']
               model = @_newCollectionModel @options.collection, id
-  
+
               @once 'model:ready', (model, response, options) =>
                 @_showView model: model
                 @trigger 'after'
-  
+
               @once 'model:error', (model, xhr, options) =>
                 # @todo Properly handle this kind of error
                 Route.logger.error 'model:error', model, xhr, options
                 @trigger 'after'
-  
+
               @_fetchModel model, @options.cache
             else
               Route.logger.info 'Fetching collection', @options.collection
               collection = new @options.app.Data.Collections[@options.collection]
-  
+
               @once 'collection:ready', (collection, response, options) =>
                 @_showView collection: collection
                 @trigger 'after'
-  
+
               @once 'collection:error', (collection, xhr, options) =>
                 # @todo Properly handle this kind of error
                 Route.logger.error 'collection:error', collection, xhr, options
                 @trigger 'after'
-  
+
               @_fetchCollection collection, @options.collection, @options.cache
           else
             @trigger 'after'
             @_showView()
         .fail =>
           Route.logger.info 'Router failed authorization'
-  
+
     # Instantiate a new model if an associated collection is known
     #
     # @param collection [Object<Backbone.Collection>] A collection associated with a model.
@@ -163,7 +165,7 @@ define [
     _newCollectionModel: (collection, id = null) ->
       model = new @options.app.Data.Collections[collection].prototype.model
         _id: id
-  
+
     # Trigger a haptic feedback event if the device supports it.
     # Relies on Cordova's notification plugin.
     #
@@ -175,7 +177,7 @@ define [
     _vibrate: (ms) ->
       if navigator && navigator.notification
         navigator.notification.vibrate(ms)
-  
+
     # Fetches a model through the localStorage cache, or directly from
     # the network, then triggers a local event when finished.
     #
@@ -200,7 +202,7 @@ define [
             @trigger 'model:ready', model, response, options
           error: (model, xhr, options) =>
             @trigger 'model:error', model, xhr, options
-  
+
     # Fetches a collection through the localStorage cache, or directly from
     # the network, then triggers a local event when finished.
     #
@@ -226,7 +228,7 @@ define [
           @trigger 'collection:ready', collection, response, options
         error: (collection, xhr, options) =>
           @trigger 'collection:error', model, xhr, options
-  
+
     # Instructs the region manager to show a new instance of the view,
     # or calls its view.render() method if a region is not set.
     #
@@ -239,7 +241,7 @@ define [
         region.show(view)
       else
         view.render()
-  
+
     # Get the region responsible for showing the view associated with this route, if any.
     #
     # @return region Object An object implementing a show() method which expects a view.
@@ -249,32 +251,32 @@ define [
         @options.region( @options.app )
       else
         undefined
-  
+
     # Wrap built-in hooks around routing lifecycle events
     #
     # @param ui [Object] The adapter's ui object (to resolve when finished)
     #
     _eventWrapper: (ui) ->
-  
+
       @once 'before', =>
         if @options.vibrate then @_vibrate(@options.vibrate)
         if @options.spinner then @options.spinner.show()
         @_registerEvents()
         @trigger 'begin'
-  
+
       @once 'after', =>
         @trigger 'finish'
         @_unregisterEvents()
         ui.bCDeferred.resolve()
         if @options.spinner then @options.spinner.hide()
-  
+
     # Start listening to events passed in via the route's options hash.
     #
     _registerEvents: ->
       unless _.isEmpty(@options.events)
         _.each @options.events, (value, key, list) =>
           @listenTo @, key, value
-  
+
     # Stop listening to events passed in via the route's options hash.
     #
     _unregisterEvents: ->

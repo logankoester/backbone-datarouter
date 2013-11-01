@@ -151,7 +151,6 @@ define [
         else
           deny 'deny:offline'
 
-      console.log 'at start', Kinvey
       user = new Kinvey.Backbone.User
-      if navigator.onLine then online() else offline()
+      if route.options.online() then online() else offline()
     .promise()
