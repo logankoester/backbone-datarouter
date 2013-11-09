@@ -1,28 +1,36 @@
 define [
+  'underscore',
   'backbone',
-  'moment'
-], (Backbone) ->
+  'moment',
+  'backbone-datarouter/dom_storage_adapter'
+], (_, Backbone, moment, DOMStorageAdapter) ->
   class Cache
-    constructor: (app) ->
-      @storage = window.localStorage
-      @monitorConnection()
+
+    @defaults:
+      logger: Cache.logger
+      namespace: null
+
+    # @property logger [Object] Optional logger dependency (such as npm's loglevel).
+    @logger: console
+
+    constructor: (app, @options) ->
+      @options ||= {}
+      @options = _.extend @options, Cache.defaults
+
+      Cache.logger = @options.logger if @options.logger
+
+      unless @options.storage
+        @storage = new DOMStorageAdapter @options.namespace, 'local'
+
       @expired = false
       @app = app
       _.extend @, Backbone.Events
 
-    monitorConnection: ->
-      $(window).on
-        offline: =>
-          console.log 'Application is now offline'
-        online: =>
-          console.log 'Application is now online'
-          @tryCache()
-
     tryCache: ->
-      console.log 'Trying cache...'
+      Cache.logger.info 'Trying cache...'
       timestamp = moment.unix @storage.getItem('expireAt')
       if moment().diff(timestamp) > 0
-        console.log 'Cache expired!'
+        console.info 'Cache expired!'
         @expire()
 
     expire: ->
@@ -77,7 +85,7 @@ define [
           instance.fetch
             success: (resource, response, options) =>
               @set key, resource
-              console.log 'Fetched resource from network', resource
+              Cache.logger.info 'Fetched resource from network', resource
               @expired = false
 
               @incrementExpiration()
@@ -85,16 +93,16 @@ define [
               callback(resource) if callback
 
             error: (resource, response, options) =>
-              console.log 'Could not fetch resource.'
+              Cache.logger.info 'Could not fetch resource.'
               @trigger "miss:#{key}:error", instance
               callback(resource) if callback
         else
-          console.log 'Fetched resource from cache'
+          Cache.logger.info 'Fetched resource from cache'
           instance.set JSON.parse( @storage.getItem(key) )
           @trigger "hit:#{key}:online", instance
           callback(instance) if callback
       else
-        console.log 'Fetch called while offline, falling back to cache'
+        Cache.logger.info 'Fetch called while offline, falling back to cache'
         instance.set JSON.parse( @storage.getItem(key) )
         @trigger "hit:#{key}:offline", instance
         callback(instance) if callback

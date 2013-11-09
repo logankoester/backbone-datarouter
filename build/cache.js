@@ -1,34 +1,35 @@
 (function() {
-  define(['backbone', 'moment'], function(Backbone) {
+  define(['underscore', 'backbone', 'moment', 'backbone-datarouter/dom_storage_adapter'], function(_, Backbone, moment, DOMStorageAdapter) {
     var Cache;
     return Cache = (function() {
-      function Cache(app) {
-        this.storage = window.localStorage;
-        this.monitorConnection();
+      Cache.defaults = {
+        logger: Cache.logger,
+        namespace: null
+      };
+
+      Cache.logger = console;
+
+      function Cache(app, options) {
+        this.options = options;
+        this.options || (this.options = {});
+        this.options = _.extend(this.options, Cache.defaults);
+        if (this.options.logger) {
+          Cache.logger = this.options.logger;
+        }
+        if (!this.options.storage) {
+          this.storage = new DOMStorageAdapter(this.options.namespace, 'local');
+        }
         this.expired = false;
         this.app = app;
         _.extend(this, Backbone.Events);
       }
 
-      Cache.prototype.monitorConnection = function() {
-        var _this = this;
-        return $(window).on({
-          offline: function() {
-            return console.log('Application is now offline');
-          },
-          online: function() {
-            console.log('Application is now online');
-            return _this.tryCache();
-          }
-        });
-      };
-
       Cache.prototype.tryCache = function() {
         var timestamp;
-        console.log('Trying cache...');
+        Cache.logger.info('Trying cache...');
         timestamp = moment.unix(this.storage.getItem('expireAt'));
         if (moment().diff(timestamp) > 0) {
-          console.log('Cache expired!');
+          console.info('Cache expired!');
           return this.expire();
         }
       };
@@ -104,7 +105,7 @@
             return instance.fetch({
               success: function(resource, response, options) {
                 _this.set(key, resource);
-                console.log('Fetched resource from network', resource);
+                Cache.logger.info('Fetched resource from network', resource);
                 _this.expired = false;
                 _this.incrementExpiration();
                 _this.trigger("miss:" + key + ":success", instance);
@@ -113,7 +114,7 @@
                 }
               },
               error: function(resource, response, options) {
-                console.log('Could not fetch resource.');
+                Cache.logger.info('Could not fetch resource.');
                 _this.trigger("miss:" + key + ":error", instance);
                 if (callback) {
                   return callback(resource);
@@ -121,7 +122,7 @@
               }
             });
           } else {
-            console.log('Fetched resource from cache');
+            Cache.logger.info('Fetched resource from cache');
             instance.set(JSON.parse(this.storage.getItem(key)));
             this.trigger("hit:" + key + ":online", instance);
             if (callback) {
@@ -129,7 +130,7 @@
             }
           }
         } else {
-          console.log('Fetch called while offline, falling back to cache');
+          Cache.logger.info('Fetch called while offline, falling back to cache');
           instance.set(JSON.parse(this.storage.getItem(key)));
           this.trigger("hit:" + key + ":offline", instance);
           if (callback) {
