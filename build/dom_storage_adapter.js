@@ -5,18 +5,18 @@
       function DOMStorageAdapter(namespace, scope) {
         this.namespace = namespace;
         this.scope = scope;
-        this.storage = _storage(this.scope);
+        this.storage = this._storage(this.scope);
       }
 
       DOMStorageAdapter.prototype.setItem = function(key, value) {
         this._registerKey(key);
-        this._storage.setItem(this._namespacedKey(key), JSON.stringify(value));
+        this.storage.setItem(this._namespacedKey(key), JSON.stringify(value));
         return this;
       };
 
       DOMStorageAdapter.prototype.getItem = function(key) {
         var str;
-        str = this._storage.getItem(this._namespacedKey(key));
+        str = this.storage.getItem(this._namespacedKey(key));
         if (str) {
           return JSON.parse(str);
         } else {
@@ -25,14 +25,14 @@
       };
 
       DOMStorageAdapter.prototype.removeItem = function(key) {
-        this._storage.removeItem(this._namespacedKey(key));
+        this.storage.removeItem(this._namespacedKey(key));
         this._unregisterKey(key);
         return this;
       };
 
       DOMStorageAdapter.prototype.clear = function() {
         _.each(this._getKeys(), function(key) {
-          return this._storage.removeItem(this._namespacedKey(key));
+          return this.storage.removeItem(this._namespacedKey(key));
         });
         this._setKeys([]);
         return this;
@@ -86,7 +86,7 @@
       };
 
       DOMStorageAdapter.prototype._keysItem = function() {
-        return _namespacedKey('keys');
+        return this._namespacedKey('keys');
       };
 
       DOMStorageAdapter.prototype._namespacedKey = function(key) {

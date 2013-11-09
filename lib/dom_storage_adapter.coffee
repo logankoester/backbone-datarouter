@@ -15,7 +15,7 @@ define [
     # @param scope [String] One of 'local', 'session', or 'global'.
     #
     constructor: (@namespace, @scope) ->
-      @storage = _storage @scope
+      @storage = @_storage @scope
 
     # Stringify a JSON object and store it under a key.
     #
@@ -25,7 +25,7 @@ define [
     #
     setItem: (key, value) ->
       @_registerKey key
-      @_storage.setItem @_namespacedKey(key), JSON.stringify(value)
+      @storage.setItem @_namespacedKey(key), JSON.stringify(value)
       return @
 
     # Retrieve a stored object identified by a key.
@@ -34,7 +34,7 @@ define [
     # @return [Object] The object (deserialized by JSON.parse), or null if nothing was found.
     #
     getItem: (key) ->
-      str = @_storage.getItem( @_namespacedKey(key) )
+      str = @storage.getItem( @_namespacedKey(key) )
       if str
         return JSON.parse(str)
       else
@@ -46,7 +46,7 @@ define [
     # @return this
     #
     removeItem: (key) ->
-      @_storage.removeItem @_namespacedKey(key)
+      @storage.removeItem @_namespacedKey(key)
       @_unregisterKey key
       @
 
@@ -55,7 +55,7 @@ define [
     #
     clear: ->
       _.each @_getKeys(), (key) ->
-        @_storage.removeItem @_namespacedKey(key)
+        @storage.removeItem @_namespacedKey(key)
       @_setKeys []
       @
 
@@ -127,7 +127,7 @@ define [
     # @private
     # @return [String] The namespaced key to store the list of keys registered to this namespace.
     #
-    _keysItem: -> _namespacedKey 'keys'
+    _keysItem: -> @_namespacedKey 'keys'
 
     # @private
     # @param key [String] A key with no namespace
