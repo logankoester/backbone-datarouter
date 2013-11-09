@@ -4,7 +4,7 @@
     return Cache = (function() {
       Cache.defaults = {
         logger: Cache.logger,
-        namespace: null
+        namespace: 'cache'
       };
 
       Cache.logger = console;
@@ -12,7 +12,7 @@
       function Cache(app, options) {
         this.options = options;
         this.options || (this.options = {});
-        this.options = _.extend(this.options, Cache.defaults);
+        this.options = _.extend(Cache.defaults, this.options);
         if (this.options.logger) {
           Cache.logger = this.options.logger;
         }
@@ -27,7 +27,7 @@
       Cache.prototype.tryCache = function() {
         var timestamp;
         Cache.logger.info('Trying cache...');
-        timestamp = moment.unix(this.storage.getItem('expireAt'));
+        timestamp = moment.unix(this.storage.getItem('expireAt', false));
         if (moment().diff(timestamp) > 0) {
           console.info('Cache expired!');
           return this.expire();
@@ -44,17 +44,14 @@
         return this;
       };
 
-      Cache.prototype.set = function(key, resource) {
-        return this.storage.setItem(key, JSON.stringify(resource.toJSON()));
-      };
-
       Cache.prototype.expiresIn = function() {
-        return moment.unix(this.storage.getItem('expireAt')).fromNow();
+        return moment.unix(this.storage.getItem('expireAt', false)).fromNow();
       };
 
       Cache.prototype.incrementExpiration = function() {
-        var _ref;
-        return this.storage.setItem('expireAt', (_ref = moment()).add.apply(_ref, this.app.Settings.cache.lifespan).unix());
+        var expireAt, _ref;
+        expireAt = (_ref = moment()).add.apply(_ref, this.app.Settings.cache.lifespan).unix();
+        return this.storage.setItem('expireAt', expireAt, false);
       };
 
       Cache.prototype.preloadFinished = function() {
@@ -104,7 +101,7 @@
           if (this.expired) {
             return instance.fetch({
               success: function(resource, response, options) {
-                _this.set(key, resource);
+                _this.storage.setItem(key, resource);
                 Cache.logger.info('Fetched resource from network', resource);
                 _this.expired = false;
                 _this.incrementExpiration();
@@ -123,7 +120,7 @@
             });
           } else {
             Cache.logger.info('Fetched resource from cache');
-            instance.set(JSON.parse(this.storage.getItem(key)));
+            instance.set(this.storage.getItem(key));
             this.trigger("hit:" + key + ":online", instance);
             if (callback) {
               return callback(instance);
@@ -131,7 +128,7 @@
           }
         } else {
           Cache.logger.info('Fetch called while offline, falling back to cache');
-          instance.set(JSON.parse(this.storage.getItem(key)));
+          instance.set(this.storage.getItem(key));
           this.trigger("hit:" + key + ":offline", instance);
           if (callback) {
             return callback(instance);

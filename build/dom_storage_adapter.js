@@ -8,17 +8,30 @@
         this.storage = this._storage(this.scope);
       }
 
-      DOMStorageAdapter.prototype.setItem = function(key, value) {
+      DOMStorageAdapter.prototype.setItem = function(key, value, serialize) {
+        if (serialize == null) {
+          serialize = true;
+        }
         this._registerKey(key);
-        this.storage.setItem(this._namespacedKey(key), JSON.stringify(value));
+        if (serialize) {
+          value = JSON.stringify(value.toJSON());
+        }
+        this.storage.setItem(this._namespacedKey(key), value);
         return this;
       };
 
-      DOMStorageAdapter.prototype.getItem = function(key) {
+      DOMStorageAdapter.prototype.getItem = function(key, deserialize) {
         var str;
+        if (deserialize == null) {
+          deserialize = true;
+        }
         str = this.storage.getItem(this._namespacedKey(key));
         if (str) {
-          return JSON.parse(str);
+          if (deserialize) {
+            return JSON.parse(str);
+          } else {
+            return str;
+          }
         } else {
           return null;
         }

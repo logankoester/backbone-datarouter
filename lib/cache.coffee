@@ -8,14 +8,14 @@ define [
 
     @defaults:
       logger: Cache.logger
-      namespace: null
+      namespace: 'cache'
 
     # @property logger [Object] Optional logger dependency (such as npm's loglevel).
     @logger: console
 
     constructor: (app, @options) ->
       @options ||= {}
-      @options = _.extend @options, Cache.defaults
+      @options = _.extend Cache.defaults, @options
 
       Cache.logger = @options.logger if @options.logger
 
@@ -28,7 +28,7 @@ define [
 
     tryCache: ->
       Cache.logger.info 'Trying cache...'
-      timestamp = moment.unix @storage.getItem('expireAt')
+      timestamp = moment.unix @storage.getItem('expireAt', false)
       if moment().diff(timestamp) > 0
         console.info 'Cache expired!'
         @expire()
@@ -41,15 +41,12 @@ define [
       @storage.clear()
       @
 
-    # Serialize a model or collection into storage
-    set: (key, resource) ->
-      @storage.setItem key, JSON.stringify( resource.toJSON() )
-
     expiresIn: ->
-      moment.unix( @storage.getItem('expireAt') ).fromNow()
+      moment.unix( @storage.getItem('expireAt', false) ).fromNow()
 
     incrementExpiration: ->
-      @storage.setItem 'expireAt', moment().add(@app.Settings.cache.lifespan...).unix()
+      expireAt = moment().add(@app.Settings.cache.lifespan...).unix()
+      @storage.setItem 'expireAt', expireAt, false
 
     preloadFinished: ->
       _.every @app.Settings.cache.preloads, (resource) =>
@@ -84,7 +81,7 @@ define [
         if @expired
           instance.fetch
             success: (resource, response, options) =>
-              @set key, resource
+              @storage.setItem key, resource
               Cache.logger.info 'Fetched resource from network', resource
               @expired = false
 
@@ -98,11 +95,11 @@ define [
               callback(resource) if callback
         else
           Cache.logger.info 'Fetched resource from cache'
-          instance.set JSON.parse( @storage.getItem(key) )
+          instance.set @storage.getItem(key)
           @trigger "hit:#{key}:online", instance
           callback(instance) if callback
       else
         Cache.logger.info 'Fetch called while offline, falling back to cache'
-        instance.set JSON.parse( @storage.getItem(key) )
+        instance.set @storage.getItem(key)
         @trigger "hit:#{key}:offline", instance
         callback(instance) if callback

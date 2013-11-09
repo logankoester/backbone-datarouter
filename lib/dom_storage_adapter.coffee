@@ -21,22 +21,26 @@ define [
     #
     # @param key [String] The key (without namespace) to identify this object.
     # @param value [Object] The object to be stringified and stored.
+    # @param serialize [Boolean] If explicitely changed to false, the value will be stored raw rather than stringified as JSON.
     # @return this
     #
-    setItem: (key, value) ->
+    setItem: (key, value, serialize = true) ->
       @_registerKey key
-      @storage.setItem @_namespacedKey(key), JSON.stringify(value)
+      if serialize
+        value = JSON.stringify( value.toJSON() )
+      @storage.setItem @_namespacedKey(key), value
       return @
 
     # Retrieve a stored object identified by a key.
     #
     # @param key [String] The key (without namespace) to identify this object.
     # @return [Object] The object (deserialized by JSON.parse), or null if nothing was found.
+    # @param deserialize [Boolean] If explicitely changed to false, the value will be returned as-is rather than parsed as JSON.
     #
-    getItem: (key) ->
+    getItem: (key, deserialize = true) ->
       str = @storage.getItem( @_namespacedKey(key) )
       if str
-        return JSON.parse(str)
+        if deserialize then return JSON.parse(str) else return str
       else
         return null
 
