@@ -18,7 +18,10 @@
         authorize: function(route) {
           return $.Deferred().resolve().promise();
         },
-        logger: Route.logger
+        logger: Route.logger,
+        online: function() {
+          return navigator.onLine;
+        }
       };
 
       Route.logger = console;

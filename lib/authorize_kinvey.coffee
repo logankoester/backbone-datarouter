@@ -144,10 +144,11 @@ define [
       offline = ->
         Kinvey.Sync.offline()
         if route.options.allowOffline
-          if Kinvey.Backbone.getActiveUser()
-            allow 'allow:offline'
-          else
-            deny 'deny:guest'
+          Kinvey.init(route.options.kinvey).then (activeUser) =>
+            if Kinvey.Backbone.getActiveUser()
+              allow 'allow:offline'
+            else
+              deny 'deny:guest'
         else
           deny 'deny:offline'
 

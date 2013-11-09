@@ -95,20 +95,22 @@
           });
         };
         offline = function() {
+          var _this = this;
           Kinvey.Sync.offline();
           if (route.options.allowOffline) {
-            if (Kinvey.Backbone.getActiveUser()) {
-              return allow('allow:offline');
-            } else {
-              return deny('deny:guest');
-            }
+            return Kinvey.init(route.options.kinvey).then(function(activeUser) {
+              if (Kinvey.Backbone.getActiveUser()) {
+                return allow('allow:offline');
+              } else {
+                return deny('deny:guest');
+              }
+            });
           } else {
             return deny('deny:offline');
           }
         };
-        console.log('at start', Kinvey);
         user = new Kinvey.Backbone.User;
-        if (navigator.onLine) {
+        if (route.options.online()) {
           return online();
         } else {
           return offline();
