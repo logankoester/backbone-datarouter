@@ -30,7 +30,7 @@ define [
       Cache.logger.info 'Trying cache...'
       timestamp = moment.unix @storage.getItem('expireAt', false)
       if moment().diff(timestamp) > 0
-        console.info 'Cache expired!'
+        Cache.logger 'Cache expired!'
         @expire()
 
     expire: ->
