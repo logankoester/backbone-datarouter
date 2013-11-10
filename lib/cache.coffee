@@ -9,18 +9,21 @@ define [
     @defaults:
       logger: Cache.logger
       namespace: 'cache'
+      online: -> navigator.onLine
 
     # @property logger [Object] Optional logger dependency (such as npm's loglevel).
     @logger: console
 
     constructor: (app, @options) ->
       @options ||= {}
-      @options = _.extend Cache.defaults, @options
+      @options = _.extend _.clone(Cache.defaults), @options
 
       Cache.logger = @options.logger if @options.logger
 
       unless @options.storage
         @storage = new DOMStorageAdapter @options.namespace, 'local'
+
+      @online = @options.online
 
       @expired = false
       @app = app
@@ -28,10 +31,15 @@ define [
 
     tryCache: ->
       Cache.logger.info 'Trying cache...'
-      timestamp = moment.unix @storage.getItem('expireAt', false)
-      if moment().diff(timestamp) > 0
-        Cache.logger.info 'Cache expired!'
-        @expire()
+      if @options.online()
+        timestamp = moment.unix @storage.getItem('expireAt', false)
+        if !timestamp || moment().diff(timestamp) > 0
+          Cache.logger.info 'Cache expired!'
+          @expire()
+      else
+        Cache.logger.info 'Offline mode, preserving cache'
+        @incrementExpiration()
+      @
 
     expire: ->
       @expired = true
@@ -75,31 +83,28 @@ define [
         callback( c.get(id) ) if callback
 
     fetchCollection: (instance, key, callback) ->
-      if navigator.onLine
-        @tryCache()
+      @tryCache()
+      Cache.logger.info 'Fetching resource'
 
-        if @expired
-          instance.fetch
-            success: (resource, response, options) =>
-              @storage.setItem key, resource
-              Cache.logger.info 'Fetched resource from network', resource
-              @expired = false
+      if @expired
+        instance.fetch
+          offline: false
+          refresh: false
+          success: (resource, response, options) =>
+            @storage.setItem key, resource
+            Cache.logger.info 'Fetched resource from network', resource
+            @expired = false
 
-              @incrementExpiration()
-              @trigger "miss:#{key}:success", instance
-              callback(resource) if callback
+            @incrementExpiration()
+            @trigger "miss:#{key}:success", instance
+            callback(resource) if callback
 
-            error: (resource, response, options) =>
-              Cache.logger.info 'Could not fetch resource.'
-              @trigger "miss:#{key}:error", instance
-              callback(resource) if callback
-        else
-          Cache.logger.info 'Fetched resource from cache'
-          instance.set @storage.getItem(key)
-          @trigger "hit:#{key}:online", instance
-          callback(instance) if callback
+          error: (resource, response, options) =>
+            Cache.logger.info 'Could not fetch resource.'
+            @trigger "miss:#{key}:error", instance
+            callback(resource) if callback
       else
-        Cache.logger.info 'Fetch called while offline, falling back to cache'
+        Cache.logger.info 'Fetched resource from cache'
         instance.set @storage.getItem(key)
-        @trigger "hit:#{key}:offline", instance
+        @trigger "hit:#{key}:online", instance
         callback(instance) if callback

@@ -4,7 +4,10 @@
     return Cache = (function() {
       Cache.defaults = {
         logger: Cache.logger,
-        namespace: 'cache'
+        namespace: 'cache',
+        online: function() {
+          return navigator.onLine;
+        }
       };
 
       Cache.logger = console;
@@ -12,13 +15,14 @@
       function Cache(app, options) {
         this.options = options;
         this.options || (this.options = {});
-        this.options = _.extend(Cache.defaults, this.options);
+        this.options = _.extend(_.clone(Cache.defaults), this.options);
         if (this.options.logger) {
           Cache.logger = this.options.logger;
         }
         if (!this.options.storage) {
           this.storage = new DOMStorageAdapter(this.options.namespace, 'local');
         }
+        this.online = this.options.online;
         this.expired = false;
         this.app = app;
         _.extend(this, Backbone.Events);
@@ -27,11 +31,17 @@
       Cache.prototype.tryCache = function() {
         var timestamp;
         Cache.logger.info('Trying cache...');
-        timestamp = moment.unix(this.storage.getItem('expireAt', false));
-        if (moment().diff(timestamp) > 0) {
-          Cache.logger.info('Cache expired!');
-          return this.expire();
+        if (this.options.online()) {
+          timestamp = moment.unix(this.storage.getItem('expireAt', false));
+          if (!timestamp || moment().diff(timestamp) > 0) {
+            Cache.logger.info('Cache expired!');
+            this.expire();
+          }
+        } else {
+          Cache.logger.info('Offline mode, preserving cache');
+          this.incrementExpiration();
         }
+        return this;
       };
 
       Cache.prototype.expire = function() {
@@ -96,40 +106,34 @@
 
       Cache.prototype.fetchCollection = function(instance, key, callback) {
         var _this = this;
-        if (navigator.onLine) {
-          this.tryCache();
-          if (this.expired) {
-            return instance.fetch({
-              success: function(resource, response, options) {
-                _this.storage.setItem(key, resource);
-                Cache.logger.info('Fetched resource from network', resource);
-                _this.expired = false;
-                _this.incrementExpiration();
-                _this.trigger("miss:" + key + ":success", instance);
-                if (callback) {
-                  return callback(resource);
-                }
-              },
-              error: function(resource, response, options) {
-                Cache.logger.info('Could not fetch resource.');
-                _this.trigger("miss:" + key + ":error", instance);
-                if (callback) {
-                  return callback(resource);
-                }
+        this.tryCache();
+        Cache.logger.info('Fetching resource');
+        if (this.expired) {
+          return instance.fetch({
+            offline: false,
+            refresh: false,
+            success: function(resource, response, options) {
+              _this.storage.setItem(key, resource);
+              Cache.logger.info('Fetched resource from network', resource);
+              _this.expired = false;
+              _this.incrementExpiration();
+              _this.trigger("miss:" + key + ":success", instance);
+              if (callback) {
+                return callback(resource);
               }
-            });
-          } else {
-            Cache.logger.info('Fetched resource from cache');
-            instance.set(this.storage.getItem(key));
-            this.trigger("hit:" + key + ":online", instance);
-            if (callback) {
-              return callback(instance);
+            },
+            error: function(resource, response, options) {
+              Cache.logger.info('Could not fetch resource.');
+              _this.trigger("miss:" + key + ":error", instance);
+              if (callback) {
+                return callback(resource);
+              }
             }
-          }
+          });
         } else {
-          Cache.logger.info('Fetch called while offline, falling back to cache');
+          Cache.logger.info('Fetched resource from cache');
           instance.set(this.storage.getItem(key));
-          this.trigger("hit:" + key + ":offline", instance);
+          this.trigger("hit:" + key + ":online", instance);
           if (callback) {
             return callback(instance);
           }

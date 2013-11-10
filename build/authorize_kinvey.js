@@ -27,16 +27,13 @@
             },
             error: function(model, xhr, options) {
               logger.error('Failed to create account', xhr);
+              route.pushError(xhr);
               return deny('deny:error');
             }
           });
         };
         autoUsername = function() {
-          if (typeof device !== "undefined" && device !== null) {
-            return device['uuid'];
-          } else {
-            return chance.guid();
-          }
+          return chance.guid();
         };
         autoPassword = function() {
           return chance.hash();
@@ -48,6 +45,10 @@
             } else {
               return deny('deny:user');
             }
+          }, function(error) {
+            logger.error('Failed to login with credentials', error);
+            route.pushError(error);
+            return deny('deny:error');
           });
         };
         online = function() {
@@ -75,7 +76,6 @@
                 } else {
                   if (route.options.autoAccount) {
                     chance = new Chance();
-                    console.log('chance', chance, Chance);
                     try {
                       return autoAccount({
                         username: autoUsername(),
@@ -92,18 +92,33 @@
                 }
               }
             }
+          }, function(error) {
+            logger.error('Kinvey init error', error);
+            route.pushError(error);
+            return deny('deny:error');
           });
         };
         offline = function() {
-          var _this = this;
+          var options,
+            _this = this;
           Kinvey.Sync.offline();
           if (route.options.allowOffline) {
-            return Kinvey.init(route.options.kinvey).then(function(activeUser) {
+            options = _.clone(route.options.kinvey);
+            options.online = false;
+            return Kinvey.init(options).then(function(activeUser) {
               if (Kinvey.Backbone.getActiveUser()) {
                 return allow('allow:offline');
               } else {
-                return deny('deny:guest');
+                if (route.options.allowGuest) {
+                  return allow('allow:guest');
+                } else {
+                  return deny('deny:guest');
+                }
               }
+            }, function(error) {
+              console.error('Kinvey init error', error);
+              route.pushError(error);
+              return deny('deny:error');
             });
           } else {
             return deny('deny:offline');

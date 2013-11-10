@@ -73,6 +73,7 @@ define [
             allow 'allow:created'
           error: (model, xhr, options) ->
             logger.error 'Failed to create account', xhr
+            route.pushError xhr
             deny 'deny:error'
 
       # Return a username for the automatically generated user.
@@ -81,8 +82,7 @@ define [
       #
       # @return username [String]
       #
-      autoUsername = ->
-        if device? then device['uuid'] else chance.guid()
+      autoUsername = -> chance.guid()
 
       # Generate and return a secure password (a 40char hex hash)
       #
@@ -100,6 +100,10 @@ define [
             allow 'allow:user'
           else
             deny 'deny:user'
+        , (error) ->
+          logger.error 'Failed to login with credentials', error
+          route.pushError error
+          deny 'deny:error'
 
       # Ensure Kinvey is in online mode and then initialize it.
       #
@@ -128,7 +132,6 @@ define [
               else
                 if route.options.autoAccount
                   chance = new Chance()
-                  console.log 'chance', chance, Chance
                   try
                     autoAccount username: autoUsername(), password: autoPassword()
                   catch error
@@ -136,6 +139,10 @@ define [
                     deny 'deny:guest'
                 else
                   deny 'deny:guest'
+        , (error) =>
+          logger.error 'Kinvey init error', error
+          route.pushError error
+          deny 'deny:error'
 
       # Ensure Kinvey is in offline mode, and deny if allowOffline is disabled.
       #
@@ -144,11 +151,20 @@ define [
       offline = ->
         Kinvey.Sync.offline()
         if route.options.allowOffline
-          Kinvey.init(route.options.kinvey).then (activeUser) =>
+          options = _.clone(route.options.kinvey)
+          options.online = false
+          Kinvey.init(options).then (activeUser) =>
             if Kinvey.Backbone.getActiveUser()
               allow 'allow:offline'
             else
-              deny 'deny:guest'
+              if route.options.allowGuest
+                allow 'allow:guest'
+              else
+                deny 'deny:guest'
+          , (error) =>
+            console.error 'Kinvey init error', error
+            route.pushError error
+            deny 'deny:error'
         else
           deny 'deny:offline'
 

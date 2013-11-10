@@ -27,23 +27,31 @@
       Route.logger = console;
 
       function Route(options) {
+        var errors;
         this.options = options;
         this._handler = __bind(this._handler, this);
         _.extend(this, Backbone.Events);
         this.options || (this.options = {});
-        this.options = _.extend(this.options, Route.defaults);
+        this.options = _.extend(_.clone(Route.defaults), this.options);
         if (this.options.logger) {
           Route.logger = this.options.logger;
         }
         this.on('all', function(event) {
-          return Route.logger.debug('Route event', event);
+          return Route.logger.debug("Route event " + event);
         });
-        this.errors = !this.validate(this.options);
-        if (this.errors) {
-          Route.logger.error("Route has invalid options", this.errors, this);
+        if (errors = !this.validate(this.options)) {
+          Route.logger.error("Route has invalid options", errors, this);
         }
         this.register(this.options['app'], this.options['pattern']);
       }
+
+      Route.prototype.getErrors = function() {
+        return this.errors || (this.errors = []);
+      };
+
+      Route.prototype.pushError = function(error) {
+        return this.getErrors().push(error);
+      };
 
       Route.prototype.validate = function(options) {
         var errors, _ref;
@@ -103,7 +111,8 @@
               model = _this._newCollectionModel(_this.options.collection, id);
               _this.once('model:ready', function(model, response, options) {
                 _this._showView({
-                  model: model
+                  model: model,
+                  params: params
                 });
                 return _this.trigger('after');
               });
@@ -117,7 +126,8 @@
               collection = new _this.options.app.Data.Collections[_this.options.collection];
               _this.once('collection:ready', function(collection, response, options) {
                 _this._showView({
-                  collection: collection
+                  collection: collection,
+                  params: params
                 });
                 return _this.trigger('after');
               });
@@ -129,10 +139,16 @@
             }
           } else {
             _this.trigger('after');
-            return _this._showView();
+            return _this._showView({
+              params: params
+            });
           }
         }).fail(function() {
-          return Route.logger.info('Router failed authorization');
+          Route.logger.error('Router failed authorization');
+          _this.trigger('after');
+          return _this._showView({
+            params: params
+          });
         });
       };
 
@@ -192,13 +208,12 @@
         }
       };
 
-      Route.prototype._showView = function(options) {
+      Route.prototype._showView = function(opts) {
         var region, view;
-        if (options == null) {
-          options = null;
+        if (opts == null) {
+          opts = null;
         }
-        Route.logger.info('Router showing view', this.options.view, options);
-        view = new this.options.view(options);
+        view = new this.options.view(opts);
         if (region = this._getRegion()) {
           return region.show(view);
         } else {

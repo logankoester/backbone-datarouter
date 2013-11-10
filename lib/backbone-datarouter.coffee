@@ -60,15 +60,25 @@ define [
       _.extend @, Backbone.Events
 
       @options ||= {}
-      @options = _.extend @options, Route.defaults
+      @options = _.extend _.clone(Route.defaults), @options
       Route.logger = @options.logger if @options.logger
 
-      @on 'all', (event) -> Route.logger.debug 'Route event', event
+      @on 'all', (event) -> Route.logger.debug "Route event #{event}"
 
-      @errors = !@validate(@options)
-      if @errors
-        Route.logger.error "Route has invalid options", @errors, @
+      if errors = !@validate(@options)
+        Route.logger.error "Route has invalid options", errors, @
       @register @options['app'], @options['pattern']
+
+    # A list of errors the user may need to deal with after routing is finished.
+    # This does not include validation errors, which are just logged immediately then discarded.
+    # @return Array A list of error objects collected by this route
+    #
+    getErrors: -> @errors ||= []
+
+    # Add an error object to the list for users to deal with after routing is finished.
+    # @private
+    #
+    pushError: (error) -> @getErrors().push error
 
     # Check if a route options hash is valid.
     #
@@ -127,7 +137,7 @@ define [
               model = @_newCollectionModel @options.collection, id
 
               @once 'model:ready', (model, response, options) =>
-                @_showView model: model
+                @_showView model: model, params: params
                 @trigger 'after'
 
               @once 'model:error', (model, xhr, options) =>
@@ -141,7 +151,7 @@ define [
               collection = new @options.app.Data.Collections[@options.collection]
 
               @once 'collection:ready', (collection, response, options) =>
-                @_showView collection: collection
+                @_showView collection: collection, params: params
                 @trigger 'after'
 
               @once 'collection:error', (collection, xhr, options) =>
@@ -152,9 +162,11 @@ define [
               @_fetchCollection collection, @options.collection, @options.cache
           else
             @trigger 'after'
-            @_showView()
+            @_showView params: params
         .fail =>
-          Route.logger.info 'Router failed authorization'
+          Route.logger.error 'Router failed authorization'
+          @trigger 'after'
+          @_showView params: params
 
     # Instantiate a new model if an associated collection is known
     #
@@ -232,11 +244,10 @@ define [
     # Instructs the region manager to show a new instance of the view,
     # or calls its view.render() method if a region is not set.
     #
-    # @param options [Object] Options hash to pass into the view (if any)
+    # @param opts [Object] Options hash to pass into the view (if any)
     #
-    _showView: (options = null) ->
-      Route.logger.info 'Router showing view', @options.view, options
-      view = new @options.view(options)
+    _showView: (opts = null) ->
+      view = new @options.view(opts)
       if region = @_getRegion()
         region.show(view)
       else

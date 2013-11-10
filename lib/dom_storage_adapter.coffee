@@ -58,7 +58,7 @@ define [
     # @return this
     #
     clear: ->
-      _.each @_getKeys(), (key) ->
+      _.each @_getKeys(), (key) =>
         @storage.removeItem @_namespacedKey(key)
       @_setKeys []
       @
