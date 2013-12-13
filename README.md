@@ -5,6 +5,9 @@
 [![status](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/badges/status.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
 [![Dependency Status](https://david-dm.org/logankoester/backbone-datarouter.png)](https://david-dm.org/logankoester/backbone-datarouter)
 [![devDependency Status](https://david-dm.org/logankoester/backbone-datarouter/dev-status.png)](https://david-dm.org/logankoester/backbone-datarouter#info=devDependencies)
+[![NPM version](https://badge.fury.io/js/backbone-datarouter.png)](http://badge.fury.io/js/backbone-datarouter)
+[![Bower version](https://badge.fury.io/bo/backbone-datarouter.png)](http://badge.fury.io/bo/backbone-datarouter)
+[![Gittip](http://img.shields.io/gittip/logankoester.png)](https://www.gittip.com/logankoester/)
 
 [![NPM](https://nodei.co/npm/backbone-datarouter.png?downloads=true)](https://nodei.co/npm/backbone-datarouter/)
 
@@ -20,6 +23,8 @@ The `--save` flag will save backbone-datarouter as a dependency in your project'
 This library should not be considered stable at this point. It is rapidly evolving alongside an internal project.
 
 Proper tests and documentation are yet to come. In the mean time, feel free to explore if you like.
+
+> #### [View Documentation](http://coffeedoc.info/github/logankoester/backbone-datarouter/master/)
 
 ## LICENSE
 
