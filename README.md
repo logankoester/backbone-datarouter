@@ -1,7 +1,7 @@
 # Backbone DataRouter
 > A router abstraction built with jquery-mobile, localstorage caching, and backbone collections in mind.
 
-[![Build Status](http://ci.ldk.io/logankoester/dancesafe-data/badge)](http://ci.ldk.io/logankoester/dancesafe-data/)
+[![Build Status](http://ci.ldk.io/logankoester/backbone-datarouter/badge)](http://ci.ldk.io/logankoester/backbone-datarouter/)
 
 ## Installation
 
