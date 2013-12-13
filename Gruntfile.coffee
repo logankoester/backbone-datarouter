@@ -8,8 +8,7 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'build', [
     'clean',
-    'coffee',
-    'copy',
+    'coffee'
   ]
 
   grunt.registerTask 'default', ['build']
