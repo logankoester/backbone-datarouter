@@ -1,5 +1,4 @@
 # Backbone DataRouter
-> A router abstraction built with jquery-mobile, localstorage caching, and backbone collections in mind.
 
 [![Build Status](http://ci.ldk.io/logankoester/backbone-datarouter/badge)](http://ci.ldk.io/logankoester/backbone-datarouter/)
 [![Dependency Status](https://david-dm.org/logankoester/backbone-datarouter.png)](https://david-dm.org/logankoester/backbone-datarouter)
@@ -10,15 +9,15 @@
 
 [![NPM](https://nodei.co/npm/backbone-datarouter.png?downloads=true)](https://nodei.co/npm/backbone-datarouter/)
 
-> **WARNING** This library is in an early, experimental stage at the moment. Don't take it seriously just yet.
+**WARNING** This library is in an early, experimental stage at the moment. Don't take it seriously just yet.
+
+-
 
 ## Overview
 
 **DataRouter** offers a friendly CoffeeScript-oriented syntax for describing resource-oriented routes in single-page applications.
 
-#### DataRouter
 ```coffeescript
-# Index items/
 App.route '#items': require('items/index'), collection: 'Items' region: (App) -> App.getRegion 'list'
 ```
 
