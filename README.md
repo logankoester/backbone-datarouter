@@ -1,6 +1,6 @@
 # backbone-datarouter
 
-[![Build Status](https://secure.travis-ci.org/logankoester/backbone-datarouter.png?branch=master)](https://travis-ci.org/logankoester/backbone-datarouter)
+[![Build Status](http://ci.ldk.io/logankoester/dancesafe-data/badge)](http://ci.ldk.io/logankoester/dancesafe-data/)
 
 description
 
