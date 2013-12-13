@@ -2,6 +2,11 @@
 > A router abstraction built with jquery-mobile, localstorage caching, and backbone collections in mind.
 
 [![Build Status](http://ci.ldk.io/logankoester/backbone-datarouter/badge)](http://ci.ldk.io/logankoester/backbone-datarouter/)
+[![status](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/badges/status.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
+[![Dependency Status](https://david-dm.org/logankoester/backbone-datarouter.png)](https://david-dm.org/logankoester/backbone-datarouter)
+[![devDependency Status](https://david-dm.org/logankoester/backbone-datarouter/dev-status.png)](https://david-dm.org/logankoester/backbone-datarouter#info=devDependencies)
+
+[![NPM](https://nodei.co/npm/backbone-datarouter.png?downloads=true)](https://nodei.co/npm/backbone-datarouter/)
 
 ## Installation
 
