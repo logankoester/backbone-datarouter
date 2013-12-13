@@ -18,8 +18,8 @@
 
 #### DataRouter
 ```coffeescript
-    # Index items/
-    App.route '#items': require('items/index'), collection: 'Items' region: (App) -> App.getRegion 'list'
+# Index items/
+App.route '#items': require('items/index'), collection: 'Items' region: (App) -> App.getRegion 'list'
 ```
 
 Data resources are automatically fetched and cached for you before initializing the view. It works well with [Backbone.Marionette](https://github.com/marionettejs/backbone.marionette) and may even require it in the future.
