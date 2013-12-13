@@ -116,7 +116,7 @@
                 }
               }
             }, function(error) {
-              console.error('Kinvey init error', error);
+              logger.error('Kinvey init error', error);
               route.pushError(error);
               return deny('deny:error');
             });

@@ -209,15 +209,23 @@
       };
 
       Route.prototype._showView = function(opts) {
-        var region, view;
+        var error, region, view;
         if (opts == null) {
           opts = null;
         }
-        view = new this.options.view(opts);
-        if (region = this._getRegion()) {
-          return region.show(view);
-        } else {
-          return view.render();
+        try {
+          view = new this.options.view(opts);
+          if (region = this._getRegion()) {
+            return region.show(view);
+          } else {
+            return view.render();
+          }
+        } catch (_error) {
+          error = _error;
+          if (error.name === 'TemplateNotFoundError') {
+            Route.logger.debug("View (instance of '" + view.constructor.name + "') attempted to render without a template.");
+          }
+          return Route.logger.error(error.name, error.message);
         }
       };
 

@@ -247,11 +247,16 @@ define [
     # @param opts [Object] Options hash to pass into the view (if any)
     #
     _showView: (opts = null) ->
-      view = new @options.view(opts)
-      if region = @_getRegion()
-        region.show(view)
-      else
-        view.render()
+      try
+        view = new @options.view(opts)
+        if region = @_getRegion()
+          region.show(view)
+        else
+          view.render()
+      catch error
+        if error.name == 'TemplateNotFoundError'
+          Route.logger.debug "View (instance of '#{view.constructor.name}') attempted to render without a template."
+        Route.logger.error error.name, error.message
 
     # Get the region responsible for showing the view associated with this route, if any.
     #
