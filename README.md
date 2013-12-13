@@ -1,116 +1,32 @@
-# backbone-datarouter
+# Backbone DataRouter
+> A router abstraction built with jquery-mobile, localstorage caching, and backbone collections in mind.
 
 [![Build Status](http://ci.ldk.io/logankoester/dancesafe-data/badge)](http://ci.ldk.io/logankoester/dancesafe-data/)
 
-description
+## Installation
 
-Contributers:
-
-- Logan Koester
-
----
-### [Contents](id:contents)
-- [Usage](#usage)
-- [Install](#install)
-- [Why](#why)
-- [Example](#example)
-- [API](#api)
-- [Tests](#tests)
-- [Support](#support)
-
----
-### [Usage](id:usage)
-
-
----
-[top](#contents)
-### [Install](id:install)
-
-Bower is a package manager for the web built by twitter, you should check it out, and download this package.
-
-`$ npm install bower -g`  
+`$ npm install bower -g`
 `$ bower install backbone-datarouter --save `
 
 The `--save` flag will save backbone-datarouter as a dependency in your project's `bower.json` file.
 
-OR  
+## Getting Started
 
-Download this project, take `backbone-datarouter.js` or `backbone-datarouter.min.js` files out and put them wherever you would like.
+This library should not be considered stable at this point. It is rapidly evolving alongside an internal project.
 
----
-[top](#contents)
-### [Why](id:why)
+Proper tests and documentation are yet to come. In the mean time, feel free to explore if you like.
 
----
-[top](#contents)
-### [Example](id:example)
+## LICENSE
 
-There is a small how-to in this repository at [example/example.html](https://github.com/logankoester/backbone-datarouter/blob/master/example/example.html). 
+Copyright (c) 2013 Logan Koester.
+Released under the MIT license. See `LICENSE` for details.
 
-_description of what the example does here_
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/logankoester/backbone-datarouter/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
-To run the example.
-
-```
-$ git clone git@github.com:logankoester/backbone-datarouter.git
-$ cd backbone-datarouter/
-$ bower install
-$ node ./util/web-server.js
-```
-
-and then navigate to <http://localhost:8000/example/example.html>
-
----
-[top](#contents)
-### [API](id:api)
-
----
-[top](#contents)
-### [Tests](id:tests)
-
-Tests are in the `test/` directory, they are written with mocha, and run via `testrunner.html`. To get the dependencies for testing, you must have npm and bower installed: `npm install -g bower`.
-
-Single Test Run. This is how travis-ci runs the tests.
-
-```
-$ git clone git@github.com:logankoester/backbone-datarouter.git  
-$ cd backbone-datarouter/
-$ npm install
-$ bower install
-$ npm test
-```
-
-**OR**  
-
-Run them in the terminal as you Develop!!!
-
-```
-$ git clone git@github.com:logankoester/backbone-datarouter.git  
-$ cd backbone-datarouter/
-$ npm install
-$ bower install
-```
-
-Start a server in one terminal window.  
-`$ grunt nodemon`
-
-And then in another terminal window.
-
-```   
-$ cd backbone-datarouter/ 
-$ grunt watch
-```
-
-and then just start developing. Grunt will run automated tests with [mocha-phantomjs](https://github.com/metaskills/mocha-phantomjs), and JSHint whenever you save files.
-
-Also tests in the browser at <http://localhost:8000/testrunner.html>
-
----
-[top](#contents)
-### [Support](id:support)
-
-You can make an issue. Pull requests welcome.
-
-_your contact info here_
-
-component generated with yeoman and [backbone-module](https://github.com/nackjicholson/generator-backbone-module)
+[![xrefs](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/badges/xrefs.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
+[![funcs](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/badges/funcs.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
+[![top func](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/badges/top-func.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
+[![library users](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/badges/library-users.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
+[![authors](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/badges/authors.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
+[![Total views](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/counters/views.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
+[![Views in the last 24 hours](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/counters/views-24h.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
