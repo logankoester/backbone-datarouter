@@ -162,7 +162,7 @@ define [
               else
                 deny 'deny:guest'
           , (error) =>
-            console.error 'Kinvey init error', error
+            logger.error 'Kinvey init error', error
             route.pushError error
             deny 'deny:error'
         else
