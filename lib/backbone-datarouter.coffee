@@ -71,7 +71,7 @@ define [
 
     # A list of errors the user may need to deal with after routing is finished.
     # This does not include validation errors, which are just logged immediately then discarded.
-    # @return Array A list of error objects collected by this route
+    # @return [Array] A list of error objects collected by this route
     #
     getErrors: -> @errors ||= []
 
