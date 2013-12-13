@@ -21,6 +21,8 @@ This library should not be considered stable at this point. It is rapidly evolvi
 
 Proper tests and documentation are yet to come. In the mean time, feel free to explore if you like.
 
+> #### [View Documentation](http://coffeedoc.info/github/logankoester/backbone-datarouter/master/)
+
 ## LICENSE
 
 Copyright (c) 2013 Logan Koester.
