@@ -5,8 +5,8 @@
 
 ## Installation
 
-`$ npm install bower -g`
-`$ bower install backbone-datarouter --save `
+    $ npm install bower -g
+    $ bower install backbone-datarouter --save
 
 The `--save` flag will save backbone-datarouter as a dependency in your project's `bower.json` file.
 
