@@ -5,6 +5,9 @@
 [![status](https://sourcegraph.com/api/repos/github.com/logankoester/backbone-datarouter/badges/status.png)](https://sourcegraph.com/github.com/logankoester/backbone-datarouter)
 [![Dependency Status](https://david-dm.org/logankoester/backbone-datarouter.png)](https://david-dm.org/logankoester/backbone-datarouter)
 [![devDependency Status](https://david-dm.org/logankoester/backbone-datarouter/dev-status.png)](https://david-dm.org/logankoester/backbone-datarouter#info=devDependencies)
+[![NPM version](https://badge.fury.io/js/backbone-datarouter.png)](http://badge.fury.io/js/backbone-datarouter)
+[![Bower version](https://badge.fury.io/bo/backbone-datarouter.png)](http://badge.fury.io/bo/backbone-datarouter)
+[![Gittip](http://img.shields.io/gittip/logankoester.png)](https://www.gittip.com/logankoester/)
 
 [![NPM](https://nodei.co/npm/backbone-datarouter.png?downloads=true)](https://nodei.co/npm/backbone-datarouter/)
 
