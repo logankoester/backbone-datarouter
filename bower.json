@@ -1,6 +1,6 @@
 {
   "name": "backbone-datarouter",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "Logan Koester",
   "description": "A router abstraction built with jquery-mobile, localstorage caching, and backbone collections in mind.",
   "main": "build",
