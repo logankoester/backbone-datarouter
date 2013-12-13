@@ -1,5 +1,5 @@
 (function() {
-  define(['kinvey', 'Chance'], function(Kinvey, Chance) {
+  define(['kinvey', 'chance'], function(Kinvey, Chance) {
     return function(route) {
       return $.Deferred(function(deferred) {
         var allow, autoAccount, autoPassword, autoUsername, deny, logger, login, offline, online, user;
