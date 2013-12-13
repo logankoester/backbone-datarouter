@@ -10,6 +10,24 @@
 
 [![NPM](https://nodei.co/npm/backbone-datarouter.png?downloads=true)](https://nodei.co/npm/backbone-datarouter/)
 
+> **WARNING** This library is in an early, experimental stage at the moment. Don't take it seriously just yet.
+
+## Overview
+
+**DataRouter** offers a friendly CoffeeScript-oriented syntax for describing resource-oriented routes in single-page applications.
+
+#### DataRouter
+```coffeescript
+    # Index items/
+    App.route '#items': require('items/index'), collection: 'Items' region: (App) -> App.getRegion 'list'
+```
+
+Data resources are automatically fetched and cached for you before initializing the view. It works well with [Backbone.Marionette](https://github.com/marionettejs/backbone.marionette) and may even require it in the future.
+
+This library *currently* depends on [jquerymobile-router](https://github.com/azicchetti/jquerymobile-router), but this requirement [will be going away](https://github.com/logankoester/backbone-datarouter/issues/10). DataRouter is ultimately intended for general use.
+
+#### [View Full Documentation](http://coffeedoc.info/github/logankoester/backbone-datarouter/master/)
+
 ## Installation
 
     $ npm install bower -g
@@ -19,11 +37,7 @@ The `--save` flag will save backbone-datarouter as a dependency in your project'
 
 ## Getting Started
 
-This library should not be considered stable at this point. It is rapidly evolving alongside an internal project.
-
-Proper tests and documentation are yet to come. In the mean time, feel free to explore if you like.
-
-> #### [View Documentation](http://coffeedoc.info/github/logankoester/backbone-datarouter/master/)
+> **Somebody still needs to write this section. Why not you?**
 
 ## LICENSE
 
