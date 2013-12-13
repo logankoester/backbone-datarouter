@@ -18,7 +18,7 @@
 **DataRouter** offers a friendly CoffeeScript-oriented syntax for describing resource-oriented routes in single-page applications.
 
 ```coffeescript
-App.route '#items': require('items/index'), collection: 'Items' region: (App) -> App.getRegion 'list'
+A.route '#items': require('items/index'), collection: 'Items' region: (A)-> A.getRegion 'list'
 ```
 
 Data resources are automatically fetched and cached for you before initializing the view. It works well with [Backbone.Marionette](https://github.com/marionettejs/backbone.marionette) and may even require it in the future.
