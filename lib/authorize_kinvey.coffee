@@ -31,7 +31,7 @@
 #
 define [
   'kinvey',
-  'Chance'
+  'chance'
 ], (Kinvey, Chance) ->
   (route) ->
     $.Deferred (deferred) ->
