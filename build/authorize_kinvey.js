@@ -1,5 +1,5 @@
 (function() {
-  define(['kinvey', 'chance'], function(Kinvey, Chance) {
+  define(['kinvey', 'chance'], function(Kinvey) {
     return function(route) {
       return $.Deferred(function(deferred) {
         var allow, autoAccount, autoPassword, autoUsername, deny, logger, login, offline, online, user;
@@ -55,7 +55,7 @@
           var _this = this;
           Kinvey.Sync.online();
           return Kinvey.init(route.options.kinvey).then(function(activeUser) {
-            var cache, chance, error, password, username;
+            var cache, error, password, username;
             if (activeUser) {
               logger.info('Already logged in', activeUser);
               return allow('allow:user');
@@ -75,7 +75,6 @@
                   return allow('allow:guest');
                 } else {
                   if (route.options.autoAccount) {
-                    chance = new Chance();
                     try {
                       return autoAccount({
                         username: autoUsername(),

@@ -32,7 +32,7 @@
 define [
   'kinvey',
   'chance'
-], (Kinvey, Chance) ->
+], (Kinvey) ->
   (route) ->
     $.Deferred (deferred) ->
       # Inherit the route's logging function, if any
@@ -131,7 +131,6 @@ define [
                 allow 'allow:guest'
               else
                 if route.options.autoAccount
-                  chance = new Chance()
                   try
                     autoAccount username: autoUsername(), password: autoPassword()
                   catch error
