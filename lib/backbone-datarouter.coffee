@@ -24,7 +24,6 @@ define [
 
     @defaults:
       cache: true
-      vibrate: 50
       spinner:
         show: -> $.mobile.loading 'show'
         hide: -> $.mobile.loading 'hide'
@@ -45,7 +44,6 @@ define [
     #
     # @option options collection [Object<Backbone.Collection>] An optional collection to fetch and pass into the view.
     # @option options cache [Boolean] If disabled, model & collection will ignore the local cache and attempt to fetch from the network instead.
-    # @option options vibrate [Integer] Optional duration to vibrate the device (if compatible).
     # @option options spinner [Object] Overload functions 'call' and 'hide' to use a custom loading animation.
     # @option options events [Object] Events hash for routing lifecycle.
     # @option options authorize [Function] Optional function returning a promise. Routing will continue when fulfilled, or abort when rejected. This route instance will be passed as a parameter.
@@ -178,18 +176,6 @@ define [
       model = new @options.app.Data.Collections[collection].prototype.model
         _id: id
 
-    # Trigger a haptic feedback event if the device supports it.
-    # Relies on Cordova's notification plugin.
-    #
-    # @see http://docs.phonegap.com/en/1.7.0/cordova_notification_notification.md.html
-    #
-    # @param ms [Integer] Duration in miliseconds
-    #
-    #
-    _vibrate: (ms) ->
-      if navigator && navigator.notification
-        navigator.notification.vibrate(ms)
-
     # Fetches a model through the localStorage cache, or directly from
     # the network, then triggers a local event when finished.
     #
@@ -275,7 +261,6 @@ define [
     _eventWrapper: (ui) ->
 
       @once 'before', =>
-        if @options.vibrate then @_vibrate(@options.vibrate)
         if @options.spinner then @options.spinner.show()
         @_registerEvents()
         @trigger 'begin'

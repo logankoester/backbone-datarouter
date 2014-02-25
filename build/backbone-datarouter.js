@@ -6,7 +6,6 @@
     Route = (function() {
       Route.defaults = {
         cache: true,
-        vibrate: 50,
         spinner: {
           show: function() {
             return $.mobile.loading('show');
@@ -162,12 +161,6 @@
         });
       };
 
-      Route.prototype._vibrate = function(ms) {
-        if (navigator && navigator.notification) {
-          return navigator.notification.vibrate(ms);
-        }
-      };
-
       Route.prototype._fetchModel = function(model, useCache) {
         var id,
           _this = this;
@@ -240,9 +233,6 @@
       Route.prototype._eventWrapper = function(ui) {
         var _this = this;
         this.once('before', function() {
-          if (_this.options.vibrate) {
-            _this._vibrate(_this.options.vibrate);
-          }
           if (_this.options.spinner) {
             _this.options.spinner.show();
           }
