@@ -81,6 +81,12 @@
               return callback.call();
             }
           });
+          _this.once("miss:" + resource + ":error", function() {
+            this.preloaded.push(resource);
+            if (this.preloadFinished() && callback) {
+              return callback.call();
+            }
+          });
           return _this.fetchCollection(new _this.app.Data.Collections[resource], resource);
         });
         return this;
