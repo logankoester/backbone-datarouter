@@ -65,30 +65,32 @@
       };
 
       Cache.prototype.preloadFinished = function() {
-        var _this = this;
-        return _.every(this.app.Settings.cache.preloads, function(resource) {
-          return _.contains(_this.preloaded, resource);
-        });
+        return _.every(this.app.Settings.cache.preloads, (function(_this) {
+          return function(resource) {
+            return _.contains(_this.preloaded, resource);
+          };
+        })(this));
       };
 
       Cache.prototype.preload = function(callback) {
-        var _this = this;
         this.preloaded = [];
-        _.each(this.app.Settings.cache.preloads, function(resource) {
-          _this.once("miss:" + resource + ":success", function() {
-            this.preloaded.push(resource);
-            if (this.preloadFinished() && callback) {
-              return callback.call();
-            }
-          });
-          _this.once("miss:" + resource + ":error", function() {
-            this.preloaded.push(resource);
-            if (this.preloadFinished() && callback) {
-              return callback.call();
-            }
-          });
-          return _this.fetchCollection(new _this.app.Data.Collections[resource], resource);
-        });
+        _.each(this.app.Settings.cache.preloads, (function(_this) {
+          return function(resource) {
+            _this.once("miss:" + resource + ":success", function() {
+              this.preloaded.push(resource);
+              if (this.preloadFinished() && callback) {
+                return callback.call();
+              }
+            });
+            _this.once("miss:" + resource + ":error", function() {
+              this.preloaded.push(resource);
+              if (this.preloadFinished() && callback) {
+                return callback.call();
+              }
+            });
+            return _this.fetchCollection(new _this.app.Data.Collections[resource], resource);
+          };
+        })(this));
         return this;
       };
 
@@ -111,30 +113,33 @@
       };
 
       Cache.prototype.fetchCollection = function(instance, key, callback) {
-        var _this = this;
         this.tryCache();
         Cache.logger.info('Fetching resource');
         if (this.expired) {
           return instance.fetch({
             offline: false,
             refresh: false,
-            success: function(resource, response, options) {
-              _this.storage.setItem(key, resource);
-              Cache.logger.info('Fetched resource from network', resource);
-              _this.expired = false;
-              _this.incrementExpiration();
-              _this.trigger("miss:" + key + ":success", instance);
-              if (callback) {
-                return callback(resource);
-              }
-            },
-            error: function(resource, response, options) {
-              Cache.logger.info('Could not fetch resource.');
-              _this.trigger("miss:" + key + ":error", instance);
-              if (callback) {
-                return callback(resource);
-              }
-            }
+            success: (function(_this) {
+              return function(resource, response, options) {
+                _this.storage.setItem(key, resource);
+                Cache.logger.info('Fetched resource from network', resource);
+                _this.expired = false;
+                _this.incrementExpiration();
+                _this.trigger("miss:" + key + ":success", instance);
+                if (callback) {
+                  return callback(resource);
+                }
+              };
+            })(this),
+            error: (function(_this) {
+              return function(resource, response, options) {
+                Cache.logger.info('Could not fetch resource.');
+                _this.trigger("miss:" + key + ":error", instance);
+                if (callback) {
+                  return callback(resource);
+                }
+              };
+            })(this)
           });
         } else {
           Cache.logger.info('Fetched resource from cache');

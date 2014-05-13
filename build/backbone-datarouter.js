@@ -97,58 +97,61 @@
       };
 
       Route.prototype._handler = function(type, match, ui, page, e) {
-        var params,
-          _this = this;
+        var params;
         e.preventDefault();
         this._eventWrapper(ui);
         this.trigger('before');
         params = this.options.app.router.getParams(match['input']);
-        return this.options.authorize(this).done(function() {
-          var collection, id, model;
-          if (_this.options.collection) {
-            if (id = params['id']) {
-              model = _this._newCollectionModel(_this.options.collection, id);
-              _this.once('model:ready', function(model, response, options) {
-                _this._showView({
-                  model: model,
-                  params: params
+        return this.options.authorize(this).done((function(_this) {
+          return function() {
+            var collection, id, model;
+            if (_this.options.collection) {
+              if (id = params['id']) {
+                model = _this._newCollectionModel(_this.options.collection, id);
+                _this.once('model:ready', function(model, response, options) {
+                  _this._showView({
+                    model: model,
+                    params: params
+                  });
+                  return _this.trigger('after');
                 });
-                return _this.trigger('after');
-              });
-              _this.once('model:error', function(model, xhr, options) {
-                Route.logger.error('model:error', model, xhr, options);
-                return _this.trigger('after');
-              });
-              return _this._fetchModel(model, _this.options.cache);
+                _this.once('model:error', function(model, xhr, options) {
+                  Route.logger.error('model:error', model, xhr, options);
+                  return _this.trigger('after');
+                });
+                return _this._fetchModel(model, _this.options.cache);
+              } else {
+                Route.logger.info('Fetching collection', _this.options.collection);
+                collection = new _this.options.app.Data.Collections[_this.options.collection];
+                _this.once('collection:ready', function(collection, response, options) {
+                  _this._showView({
+                    collection: collection,
+                    params: params
+                  });
+                  return _this.trigger('after');
+                });
+                _this.once('collection:error', function(collection, xhr, options) {
+                  Route.logger.error('collection:error', collection, xhr, options);
+                  return _this.trigger('after');
+                });
+                return _this._fetchCollection(collection, _this.options.collection, _this.options.cache);
+              }
             } else {
-              Route.logger.info('Fetching collection', _this.options.collection);
-              collection = new _this.options.app.Data.Collections[_this.options.collection];
-              _this.once('collection:ready', function(collection, response, options) {
-                _this._showView({
-                  collection: collection,
-                  params: params
-                });
-                return _this.trigger('after');
+              _this.trigger('after');
+              return _this._showView({
+                params: params
               });
-              _this.once('collection:error', function(collection, xhr, options) {
-                Route.logger.error('collection:error', collection, xhr, options);
-                return _this.trigger('after');
-              });
-              return _this._fetchCollection(collection, _this.options.collection, _this.options.cache);
             }
-          } else {
+          };
+        })(this)).fail((function(_this) {
+          return function() {
+            Route.logger.error('Router failed authorization');
             _this.trigger('after');
             return _this._showView({
               params: params
             });
-          }
-        }).fail(function() {
-          Route.logger.error('Router failed authorization');
-          _this.trigger('after');
-          return _this._showView({
-            params: params
-          });
-        });
+          };
+        })(this));
       };
 
       Route.prototype._newCollectionModel = function(collection, id) {
@@ -162,41 +165,51 @@
       };
 
       Route.prototype._fetchModel = function(model, useCache) {
-        var id,
-          _this = this;
+        var id;
         if (useCache) {
           id = model.get(model.idAttribute);
-          return this.options.app.Data.cache.getModel(this.options.collection, id, function(model) {
-            Route.logger.debug('Model ready', model);
-            return _this.trigger('model:ready', model);
-          });
+          return this.options.app.Data.cache.getModel(this.options.collection, id, (function(_this) {
+            return function(model) {
+              Route.logger.debug('Model ready', model);
+              return _this.trigger('model:ready', model);
+            };
+          })(this));
         } else {
           return model.fetch({
-            success: function(model, response, options) {
-              return _this.trigger('model:ready', model, response, options);
-            },
-            error: function(model, xhr, options) {
-              return _this.trigger('model:error', model, xhr, options);
-            }
+            success: (function(_this) {
+              return function(model, response, options) {
+                return _this.trigger('model:ready', model, response, options);
+              };
+            })(this),
+            error: (function(_this) {
+              return function(model, xhr, options) {
+                return _this.trigger('model:error', model, xhr, options);
+              };
+            })(this)
           });
         }
       };
 
       Route.prototype._fetchCollection = function(collection, collectionName, useCache) {
-        var _this = this;
         if (useCache) {
-          return this.options.app.Data.cache.fetchCollection(collection, collectionName, function(collection) {
-            return _this.trigger('collection:ready', collection);
-          });
+          return this.options.app.Data.cache.fetchCollection(collection, collectionName, (function(_this) {
+            return function(collection) {
+              return _this.trigger('collection:ready', collection);
+            };
+          })(this));
         } else {
           collection.fetch;
           return {
-            success: function(collection, response, options) {
-              return _this.trigger('collection:ready', collection, response, options);
-            },
-            error: function(collection, xhr, options) {
-              return _this.trigger('collection:error', model, xhr, options);
-            }
+            success: (function(_this) {
+              return function(collection, response, options) {
+                return _this.trigger('collection:ready', collection, response, options);
+              };
+            })(this),
+            error: (function(_this) {
+              return function(collection, xhr, options) {
+                return _this.trigger('collection:error', model, xhr, options);
+              };
+            })(this)
           };
         }
       };
@@ -231,39 +244,44 @@
       };
 
       Route.prototype._eventWrapper = function(ui) {
-        var _this = this;
-        this.once('before', function() {
-          if (_this.options.spinner) {
-            _this.options.spinner.show();
-          }
-          _this._registerEvents();
-          return _this.trigger('begin');
-        });
-        return this.once('after', function() {
-          _this.trigger('finish');
-          _this._unregisterEvents();
-          ui.bCDeferred.resolve();
-          if (_this.options.spinner) {
-            return _this.options.spinner.hide();
-          }
-        });
+        this.once('before', (function(_this) {
+          return function() {
+            if (_this.options.spinner) {
+              _this.options.spinner.show();
+            }
+            _this._registerEvents();
+            return _this.trigger('begin');
+          };
+        })(this));
+        return this.once('after', (function(_this) {
+          return function() {
+            _this.trigger('finish');
+            _this._unregisterEvents();
+            ui.bCDeferred.resolve();
+            if (_this.options.spinner) {
+              return _this.options.spinner.hide();
+            }
+          };
+        })(this));
       };
 
       Route.prototype._registerEvents = function() {
-        var _this = this;
         if (!_.isEmpty(this.options.events)) {
-          return _.each(this.options.events, function(value, key, list) {
-            return _this.listenTo(_this, key, value);
-          });
+          return _.each(this.options.events, (function(_this) {
+            return function(value, key, list) {
+              return _this.listenTo(_this, key, value);
+            };
+          })(this));
         }
       };
 
       Route.prototype._unregisterEvents = function() {
-        var _this = this;
         if (!_.isEmpty(this.options.events)) {
-          return _.each(this.options.events, function(value, key, list) {
-            return _this.stopListening(_this, key, value);
-          });
+          return _.each(this.options.events, (function(_this) {
+            return function(value, key, list) {
+              return _this.stopListening(_this, key, value);
+            };
+          })(this));
         }
       };
 
