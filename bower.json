@@ -15,12 +15,12 @@
     "**/*.html"
   ],
   "dependencies": {
-    "backbone": "~1.0.0",
-    "jquery": "~2.0.2",
-    "moment": "~2.3.1",
-    "chance": "~0.5.3",
-    "underscore": "~1.5.2",
-    "kinvey": "~1.1.3"
+    "backbone": "~1.1.2",
+    "jquery": "~2.1.1",
+    "moment": "~2.6.0",
+    "chance": "~0.5.6",
+    "underscore": "~1.6.0",
+    "kinvey": "~1.1.5"
   },
   "devDependencies": {}
 }

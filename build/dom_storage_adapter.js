@@ -44,10 +44,11 @@
       };
 
       DOMStorageAdapter.prototype.clear = function() {
-        var _this = this;
-        _.each(this._getKeys(), function(key) {
-          return _this.storage.removeItem(_this._namespacedKey(key));
-        });
+        _.each(this._getKeys(), (function(_this) {
+          return function(key) {
+            return _this.storage.removeItem(_this._namespacedKey(key));
+          };
+        })(this));
         this._setKeys([]);
         return this;
       };

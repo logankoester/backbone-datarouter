@@ -52,73 +52,79 @@
           });
         };
         online = function() {
-          var _this = this;
           Kinvey.Sync.online();
-          return Kinvey.init(route.options.kinvey).then(function(activeUser) {
-            var cache, error, password, username;
-            if (activeUser) {
-              logger.info('Already logged in', activeUser);
-              return allow('allow:user');
-            } else {
-              cache = Kinvey.Backbone.User.accountCache;
-              username = cache.getUsername();
-              password = cache.getPassword();
-              if (username && password) {
-                logger.info('Logging in with cached credentials', username, password);
-                return login({
-                  username: username,
-                  password: password
-                });
+          return Kinvey.init(route.options.kinvey).then((function(_this) {
+            return function(activeUser) {
+              var cache, error, password, username;
+              if (activeUser) {
+                logger.info('Already logged in', activeUser);
+                return allow('allow:user');
               } else {
-                logger.info('Not logged in, no cached credentials');
-                if (route.options.allowGuest) {
-                  return allow('allow:guest');
+                cache = Kinvey.Backbone.User.accountCache;
+                username = cache.getUsername();
+                password = cache.getPassword();
+                if (username && password) {
+                  logger.info('Logging in with cached credentials', username, password);
+                  return login({
+                    username: username,
+                    password: password
+                  });
                 } else {
-                  if (route.options.autoAccount) {
-                    try {
-                      return autoAccount({
-                        username: autoUsername(),
-                        password: autoPassword()
-                      });
-                    } catch (_error) {
-                      error = _error;
-                      logger.trace(error);
+                  logger.info('Not logged in, no cached credentials');
+                  if (route.options.allowGuest) {
+                    return allow('allow:guest');
+                  } else {
+                    if (route.options.autoAccount) {
+                      try {
+                        return autoAccount({
+                          username: autoUsername(),
+                          password: autoPassword()
+                        });
+                      } catch (_error) {
+                        error = _error;
+                        logger.trace(error);
+                        return deny('deny:guest');
+                      }
+                    } else {
                       return deny('deny:guest');
                     }
-                  } else {
-                    return deny('deny:guest');
                   }
                 }
               }
-            }
-          }, function(error) {
-            logger.error('Kinvey init error', error);
-            route.pushError(error);
-            return deny('deny:error');
-          });
+            };
+          })(this), (function(_this) {
+            return function(error) {
+              logger.error('Kinvey init error', error);
+              route.pushError(error);
+              return deny('deny:error');
+            };
+          })(this));
         };
         offline = function() {
-          var options,
-            _this = this;
+          var options;
           Kinvey.Sync.offline();
           if (route.options.allowOffline) {
             options = _.clone(route.options.kinvey);
             options.online = false;
-            return Kinvey.init(options).then(function(activeUser) {
-              if (Kinvey.Backbone.getActiveUser()) {
-                return allow('allow:offline');
-              } else {
-                if (route.options.allowGuest) {
-                  return allow('allow:guest');
+            return Kinvey.init(options).then((function(_this) {
+              return function(activeUser) {
+                if (Kinvey.Backbone.getActiveUser()) {
+                  return allow('allow:offline');
                 } else {
-                  return deny('deny:guest');
+                  if (route.options.allowGuest) {
+                    return allow('allow:guest');
+                  } else {
+                    return deny('deny:guest');
+                  }
                 }
-              }
-            }, function(error) {
-              logger.error('Kinvey init error', error);
-              route.pushError(error);
-              return deny('deny:error');
-            });
+              };
+            })(this), (function(_this) {
+              return function(error) {
+                logger.error('Kinvey init error', error);
+                route.pushError(error);
+                return deny('deny:error');
+              };
+            })(this));
           } else {
             return deny('deny:offline');
           }
