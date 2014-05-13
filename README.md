@@ -40,7 +40,7 @@ The `--save` flag will save backbone-datarouter as a dependency in your project'
 
 ## LICENSE
 
-Copyright (c) 2013 Logan Koester.
+Copyright (c) 2013-2014 Logan Koester.
 Released under the MIT license. See `LICENSE` for details.
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/logankoester/backbone-datarouter/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
