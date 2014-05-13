@@ -67,6 +67,9 @@ define [
         @once "miss:#{resource}:success", ->
           @preloaded.push resource
           if @preloadFinished() and callback then callback.call()
+        @once "miss:#{resource}:error", ->
+          @preloaded.push resource
+          if @preloadFinished() and callback then callback.call()
         @fetchCollection new @app.Data.Collections[resource], resource
       @
 
